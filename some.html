@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dress Your Best</title>
+    <link rel="stylesheet" href="some.css">
+    <style>
+        /* Styling for the navigation menu */
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 14px 20px;
+            display: block;
+        }
+
+        .navbar a:hover {
+            background-color: #575757;
+            border-radius: 5px;
+        }
+
+        .navbar .menu {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <div class="navbar">
+        <div class="logo">
+            <a href="#">Dress Your Best</a>
+        </div>
+        <div class="menu">
+            <a href="#home">Home</a>
+            <a href="#contact">Contact</a>
+            <a href="#help">Help</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>Find Your Perfect Color, Effortlessly</h1>
+            <button class="cta-button" id="startButton">Start Your Color Match</button>
+        </header>
+        
+        <section class="how-it-works">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <p><b>Upload Photo</b></p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <p><b>Answer quick style questions</b></p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <p><b>Get personalized color recommendations</b></p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="color-match" id="colorMatchSection">
+            <h2>Color Match</h2>
+            <div class="upload-option" id="uploadArea">
+                <p id="uploadText">Upload Photo</p>
+                <img id="imagePreview" alt="Preview">
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+            <div class="features">
+                <div class="feature">
+                    <span class="feature-check">✓</span>
+                    <span>Hair color</span>
+                </div>
+                <div class="feature">
+                    <span class="feature-check">✓</span>
+                    <span>Skin tone</span>
+                </div>
+                <div class="feature">
+                    <span class="feature-check">✓</span>
+                    <span>Eye color</span>
+                </div>
+            </div>
+            <button class="cta-button" id="analyzeButton" disabled>Get My Colors</button>
+        </section>
+        
+        <section class="benefits-section">
+            <p>Boost your confidence with color</p>
+            <p>Created for every skin tone & hair-type</p>
+        </section>
+    </div>
+    
+    <!-- Modal for style questions -->
+    <div class="modal" id="styleQuestionsModal">
+        <div class="modal-content">
+            <h2>Style Preferences</h2>
+            <form id="styleForm">
+                <div style="text-align: left; margin: 20px 0;">
+                    <p>What's your preferred color palette?</p>
+                    <label><input type="radio" name="palette" value="warm" checked> Warm tones</label><br>
+                    <label><input type="radio" name="palette" value="cool"> Cool tones</label><br>
+                    <label><input type="radio" name="palette" value="neutral"> Neutral tones</label>
+                </div>
+                
+                <div style="text-align: left; margin: 20px 0;">
+                    <p>How bold do you like your colors?</p>
+                    <label><input type="radio" name="boldness" value="subtle" checked> Subtle and muted</label><br>
+                    <label><input type="radio" name="boldness" value="medium"> Medium intensity</label><br>
+                    <label><input type="radio" name="boldness" value="vibrant"> Vibrant and bold</label>
+                </div>
+                
+                <button type="button" class="cta-button" id="submitStyleButton">Submit Preferences</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal for color results -->
+    <div class="modal" id="resultsModal">
+        <div class="modal-content">
+            <h2>Your Perfect Colors</h2>
+            <p>Based on your analysis, these colors will complement you best:</p>
+            <div class="color-results" id="colorResults">
+                <!-- Color swatches will be added here by JavaScript -->
+            </div>
+            <button class="cta-button close-modal" id="closeResultsButton">Close</button>
+        </div>
+    </div>
+<script src="some.js"></script>
+</body>
+</html>

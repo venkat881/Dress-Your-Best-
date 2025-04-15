@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ColorMatch with Face++ API</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f5; color: #333; }
+    header { padding: 1rem 2rem; background: #fff; display: flex; justify-content: space-between; border-bottom: 1px solid #ccc; }
+    .logo { font-weight: bold; color: #1a237e; font-size: 1.5rem; }
+    nav a { margin-left: 1rem; color: #333; text-decoration: none; }
+    .container { max-width: 800px; margin: 2rem auto; text-align: center; }
+    .profile-img { width: 200px; border-radius: 10px; }
+    .section-title { font-size: 1.25rem; margin-top: 2rem; color: #1a237e; font-weight: bold; }
+    .colors, .seasons, .outfits { display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
+    .color-box { width: 60px; height: 60px; border-radius: 8px; border: 1px solid #ccc; }
+    .season, .outfit-item { text-align: center; }
+    .season img, .outfit-item img { width: 80px; border-radius: 8px; }
+    .outfit-item span { display: block; margin-top: 0.5rem; font-size: 0.9rem; }
+    input[type="file"] { margin-top: 1rem; }
+    footer { text-align: center; margin-top: 4rem; padding: 1rem; background: #fff; border-top: 1px solid #ccc; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">ColorMatch</div>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </nav>
+  </header>  <div class="container">
+    <input type="file" accept="image/*" id="imageInput">
+    <br>
+    <img id="uploadedImage" src="" alt="Profile" class="profile-img" style="display:none;"><div class="section-title" id="description">Upload an image to get started</div>
+
+<div class="section-title">Recommended Colors</div>
+<div class="colors" id="colorRecommendations"></div>
+
+<div class="section-title">Best Fits for Seasons</div>
+<div class="seasons" id="seasonFit"></div>
+
+<div class="section-title">Style Inspirations</div>
+<div class="outfits" id="outfitSuggestions"></div>
+
+  </div>  <footer>
+    &copy; 2025 ColorMatch. All rights reserved.
+  </footer>  <script>
+    const imageInput = document.getElementById('imageInput');
+    const uploadedImage = document.getElementById('uploadedImage');
+    const description = document.getElementById('description');
+    const colorRecommendations = document.getElementById('colorRecommendations');
+    const seasonFit = document.getElementById('seasonFit');
+    const outfitSuggestions = document.getElementById('outfitSuggestions');
+
+    function determineSeason(attributes) {
+      const hair = attributes.hair?.color?.[0]?.color || 'unknown';
+      const skinHealth = attributes.skinstatus?.health || 0;
+      const skinDarkCircle = attributes.skinstatus?.dark_circle || 0;
+
+      if (hair === 'black') {
+        if (skinHealth < 50) return 'Winter';
+        else return 'Autumn';
+      }
+      if (hair === 'brown') {
+        if (skinHealth >= 50) return 'Autumn';
+        else return 'Winter';
+      }
+      if (hair === 'blond') {
+        if (skinHealth > 60 && skinDarkCircle < 30) return 'Spring';
+        else return 'Summer';
+      }
+      if (hair === 'red') return 'Summer';
+      if (hair === 'gray') return 'Winter';
+      return 'Autumn';
+    }
+
+    function getSeasonColors(season) {
+      const palettes = {
+        Winter: [[60, 60, 120], [180, 180, 255], [255, 255, 255]],
+        Autumn: [[205, 133, 63], [139, 69, 19], [255, 165, 0]],
+        Spring: [[255, 192, 203], [173, 216, 230], [144, 238, 144]],
+        Summer: [[255, 105, 180], [70, 130, 180], [255, 228, 225]]
+      };
+      return palettes[season] || [];
+    }
+
+    function getSeasonOutfits(season) {
+      const outfits = {
+        Winter: [
+          { img: 'https://img.icons8.com/color/96/coat.png', label: 'Cool Coats' },
+          { img: 'https://img.icons8.com/color/96/scarf.png', label: 'Scarves' }
+        ],
+        Autumn: [
+          { img: 'https://img.icons8.com/color/96/jacket.png', label: 'Earthy Jackets' },
+          { img: 'https://img.icons8.com/color/96/boots.png', label: 'Boots' }
+        ],
+        Spring: [
+          { img: 'https://img.icons8.com/color/96/dress-front-view.png', label: 'Light Dresses' },
+          { img: 'https://img.icons8.com/color/96/denim-jacket.png', label: 'Denim Jacket' }
+        ],
+        Summer: [
+          { img: 'https://img.icons8.com/color/96/t-shirt.png', label: 'Bright Tees' },
+          { img: 'https://img.icons8.com/color/96/shorts.png', label: 'Shorts' }
+        ]
+      };
+      return outfits[season] || [];
+    }
+
+    imageInput.addEventListener('change', async function () {
+      const file = this.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function (e) {
+        uploadedImage.src = e.target.result;
+        uploadedImage.style.display = 'block';
+        description.textContent = 'Analyzing image...';
+
+        const base64Image = e.target.result.split(',')[1]; // Get base64 string without prefix
+        const base64ImageSize = (base64Image.length * 3) / 4 - (base64Image.endsWith('==') ? 2 : base64Image.endsWith('=') ? 1 : 0);
+
+        try {
+          const response = await fetch('https://api-us.faceplusplus.com/facepp/v3/detect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+              api_key: 'QKEaSgewwoojJcMUxuXLrPZqR61W-y9',
+              api_secret: 'xMxvyph8CkAeqyLsFLIkvQ2Sd2fke8nd',
+              image_base64: base64Image,
+              return_attributes: 'gender,age,ethnicity,beauty,skinstatus,emotion,facequality,eyestatus,headpose,glass,blur,hair'
+            })
+          });
+
+          const result = await response.json();
+          console.log(result);
+
+          if (result.faces && result.faces.length > 0) {
+            const attributes = result.faces[0].attributes;
+            const hairColor = attributes.hair?.color?.[0]?.color || 'unknown';
+            const skinHealth = attributes.skinstatus?.health || 0;
+
+            const season = determineSeason(attributes);
+            description.textContent = `Detected hair: ${hairColor}, Skin health: ${skinHealth.toFixed(0)} → Best Season: ${season}`;
+
+            // Color suggestions
+            const colors = getSeasonColors(season);
+            colorRecommendations.innerHTML = '';
+            colors.forEach(c => {
+              const div = document.createElement('div');
+              div.className = 'color-box';
+              div.style.backgroundColor = `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+              colorRecommendations.appendChild(div);
+            });
+
+            // Season tag
+            seasonFit.innerHTML = `<div class="season"><img src="https://img.icons8.com/color/96/sweater.png" /><div>${season}</div></div>`;
+
+            // Outfit ideas
+            const outfits = getSeasonOutfits(season);
+            outfitSuggestions.innerHTML = '';
+            outfits.forEach(o => {
+              const div = document.createElement('div');
+              div.className = 'outfit-item';
+              div.innerHTML = `<img src="${o.img}" alt="Outfit"><span>${o.label}</span>`;
+              outfitSuggestions.appendChild(div);
+            });
+
+          } else {
+            description.textContent = 'No face detected. Try another image.';
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          description.textContent = 'Error analyzing image.';
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  </script></body>
+</html>

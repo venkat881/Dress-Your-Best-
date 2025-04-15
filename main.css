@@ -1,0 +1,35 @@
+/* main.css */
+body {
+    margin: 0;
+    padding: 0;
+    background-image: url('project\ logo\ \(2\).jpeg'); /* Replace with your image path */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    animation: backgroundAnimation 10s infinite alternate; /* Add animation */
+}
+
+@keyframes backgroundAnimation {
+    0% {
+        background-size: cover;
+        background-position: center;
+    }
+    50% {
+        background-size: 110%;
+        background-position: top;
+    }
+    100% {
+        background-size: cover;
+        background-position: center;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        background-size: contain; /* Adjust for smaller screens */
+        animation: none; /* Disable animation for smaller screens if needed */
+    }
+}
